@@ -51,6 +51,10 @@ public class Syslog {
 	private StringBuilder insertValues = new StringBuilder(1000);
 	private int insertCount = 0;
 	private long insertTms = System.currentTimeMillis();
+	private int maxInsertCount; // The max number of insert commands in the commit queue, default below
+	private int minTmsDelay; // The least number of milliseconds to pass between commit, default below
+	public static final int defaultMaxInsertCount = 1000;
+	public static final int defaultMinTmsDelay = 5000;
 
 	// Only necessary in simulation-mode fields:
 	private boolean simulationMode = false;
@@ -65,8 +69,21 @@ public class Syslog {
 	//	private Unit unit;
 
 	public Syslog(ConnectionProperties cp, Identity id) {
+		this(cp, id, defaultMaxInsertCount, defaultMinTmsDelay); // Default values.
+	}
+	
+	/**
+	 * 
+	 * @param cp The {@link ConnectionProperties} for this syslog instance
+	 * @param id The {@link Identity} for this syslog instance
+	 * @param maxInsertCount The max number of insert messages (SQL) in the commit buffer
+	 * @param minTmsDelay The min milliseconds between inserts into the DB
+	 */
+	public Syslog(ConnectionProperties cp, Identity id, int maxInsertCount, int minTmsDelay) {
 		this.connectionProperties = cp;
 		this.id = id;
+		this.maxInsertCount = maxInsertCount; // The max number of insert commands in the commit queue
+		this.minTmsDelay = minTmsDelay; // The least number of milliseconds to pass between commit
 	}
 
 	public Identity getIdentity() {
@@ -720,7 +737,7 @@ public class Syslog {
 		try {
 			insertValues.append(makeInsertValueSQL(entry));
 			insertCount++;
-			if (insertCount > 1000 || System.currentTimeMillis() > insertTms + 5000) {
+			if (insertCount > maxInsertCount || System.currentTimeMillis() > insertTms + minTmsDelay) {
 				String sql = makeInsertColumnSQL() + insertValues.toString();
 				c = ConnectionProvider.getConnection(connectionProperties, true);
 				s = c.createStatement();
