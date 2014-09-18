@@ -1,0 +1,5 @@
+rootProject.name = "freeacs-dbi"
+include "freeacs-common"
+project(":freeacs-common").projectDir = file("../common")
+
+
