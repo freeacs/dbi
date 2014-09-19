@@ -1,0 +1,19 @@
+apply plugin: 'java'
+apply plugin: 'eclipse-wtp'
+
+repositories {
+    mavenCentral()
+}
+
+eclipse {
+    project {
+        natures 'org.eclipse.wst.common.modulecore.ModuleCoreNature'
+    }
+}
+
+dependencies {
+    compile 'org.jfree:jfreechart:1.0.19'
+    compile 'commons-codec:commons-codec:1.9'
+    compile 'mysql:mysql-connector-java:5.1.32'
+    compile(project(":common"))
+}
