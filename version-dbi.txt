@@ -1,3 +1,5 @@
+v1.74.37 (2014-12-19)
+- bug: If a group-hiearchy was defined, and the top-level group specified a profile - then matching for a sub-group in a job would fail!
 v1.74.36 (2014-11-14)
 - bug: SyslogEntryComparator gave runtime-exceptions - provisioning reports were not run!
 v1.74.35 (2013-06-14)

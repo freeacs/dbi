@@ -303,9 +303,10 @@ public class Group {
 
 	public boolean match(Unit unit) {
 		Map<String, String> upMap = unit.getParameters();
+		Profile groupProfile = this.getTopParent().getProfile();
 		boolean match = true;
-		if (this.getProfile() != null && this.getProfile().getId().intValue() != unit.getProfile().getId())
-			match = false;
+		if (groupProfile != null && groupProfile.getId().intValue() != unit.getProfile().getId())
+			return false;
 		Group g = this;
 		GroupParameter[] gpArr = this.getGroupParameters().getGroupParameters();
 		while (match && gpArr != null) {
