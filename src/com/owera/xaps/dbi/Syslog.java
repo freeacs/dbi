@@ -23,7 +23,6 @@ import com.owera.common.db.ConnectionProperties;
 import com.owera.common.db.ConnectionProvider;
 import com.owera.common.db.NoAvailableConnectionException;
 import com.owera.common.log.Logger;
-
 import com.owera.xaps.dbi.util.SQLUtil;
 
 /**
@@ -317,11 +316,21 @@ public class Syslog {
 	//		}
 	//	}
 
+	@SuppressWarnings("deprecation")
+  private static int getYear() {
+	  return new Date().getYear();
+	}
+	
 	private String getTmsArg(SyslogEntry entry) {
 		if (simulationMode || (entry.getFacility() != null && entry.getFacility() >= 50)) {
 			if (entry.getDeviceTimestamp() != null && !entry.getDeviceTimestamp().trim().equals("Jan 1 00:00:00")) {
 				try {
-					return "'" + dbDateFormat.format(simulationTmsFormat.parse(simulationYear + " " + entry.getDeviceTimestamp())) + "'";
+				  Date deviceTms = simulationTmsFormat.parse(getYear() + " " + entry.getDeviceTimestamp());
+				  // Right after midnight on new year's eve, we might have a situation where a new year is combined with a Dec-date, making a tms almost 1 year into the future				 
+				  // Therefore, we check this, to avoid seeing a false entry in the logs for the coming year
+  			  if (deviceTms.getTime() - System.currentTimeMillis() > 3600*1000*24*30) // deviceTms is 1 month higher than now  
+				    deviceTms = new Date();
+					return "'" + dbDateFormat.format(deviceTms) + "'";
 				} catch (ParseException e) {
 					logger.error("Device timestamp (" + entry.getDeviceTimestamp() + ") could not be parsed into a date, using NOW tms instead", e);
 					return "'" + dbDateFormat.format(new Date()) + "'";
