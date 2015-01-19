@@ -1,3 +1,5 @@
+v1.74.39 (2015-01-20)
+- bug: Upon a new year, the year of the time stamp logged into syslog from other FreeACS modules was still the previous year. (2nd attempt)
 v1.74.38 (2015-01-19)
 - bug: Upon a new year, the year of the time stamp logged into syslog from other FreeACS modules was still the previous year. 
 v1.74.37 (2014-12-19)
